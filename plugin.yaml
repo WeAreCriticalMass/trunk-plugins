@@ -1,0 +1,28 @@
+version: 0.1
+# The grype override below uses `${env.HOME}`, which older CLIs do not expand
+# inside a linter environment. Pinning the floor here means a repository on an
+# older CLI fails loudly instead of silently writing its database somewhere else.
+required_trunk_version: ">=1.22.2"
+
+lint:
+  definitions:
+    # One vulnerability database for the machine, not one per repository.
+    #
+    # The upstream grype plugin sets GRYPE_DB_CACHE_DIR to
+    # `${shared_cachedir}/grype/db`, where "shared" means shared between the
+    # linters of a *single* repository. Every repository therefore downloaded and
+    # kept its own copy of the same upstream database: on the Critical Mass
+    # runner that was 61 copies at 1.9 GB — 115 GB, and effectively the whole
+    # trunk cache.
+    #
+    # The `PATH` entry is repeated verbatim from the upstream definition because
+    # Trunk replaces a sequence rather than merging into it ("to override a
+    # sequence value in the default it is necessary to fully specify the new
+    # sequence"). Dropping it leaves grype without its shim on PATH, and it does
+    # not run at all.
+    - name: grype
+      environment:
+        - name: GRYPE_DB_CACHE_DIR
+          value: ${env.HOME}/.cache/grype-shared/db
+        - name: PATH
+          list: ["${linter}", "${env.PATH}"]
