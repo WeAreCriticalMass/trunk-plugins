@@ -1,0 +1,16 @@
+---
+apiVersion: criticalmass.io/v1
+kind: Policy
+metadata: { projectId: trunk-plugins }
+spec:
+  qualityPacks: []
+  waivers: []
+  approvals:
+    {
+      R0: autonomous,
+      R1: independent-agent-review,
+      R2: human-approval,
+      R3: human-approval-and-rollback-evidence,
+    }
+  prohibitedActions:
+    [destructive-git, production-deploy, remote-push, arbitrary-shell-mutation]
