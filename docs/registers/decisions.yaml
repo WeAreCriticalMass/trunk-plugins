@@ -1,0 +1,12 @@
+schemaVersion: "1.0"
+kind: decision-register
+entries:
+  - id: D-001
+    title: "Minimal contract, empty commands"
+    status: accepted
+    owner: "constellation-owners"
+    created: "2026-08-22"
+    review: "2026-11-22"
+    expires: "2027-02-22"
+    decision: "trunk-plugins declares no verification commands because it has no mise.toml or package.json."
+    rationale: "The artefact is a Trunk plugin.yaml; inventing pnpm test would be echo-theatre."

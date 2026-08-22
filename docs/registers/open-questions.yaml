@@ -1,0 +1,12 @@
+schemaVersion: "1.0"
+kind: open-questions-register
+entries:
+  - id: Q-001
+    title: "Registry eligibility for trunk-plugins"
+    status: open
+    owner: "constellation-owners"
+    created: "2026-08-22"
+    review: "2026-11-22"
+    expires: "2027-02-22"
+    question: "trunk-plugins is not yet in the generated control-plane catalogue; eligibility follows the next regen."
+    blocking: []

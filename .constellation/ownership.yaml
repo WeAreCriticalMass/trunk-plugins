@@ -1,0 +1,14 @@
+---
+apiVersion: criticalmass.io/v1
+kind: Ownership
+metadata: { projectId: trunk-plugins }
+spec:
+  accountable:
+    - group: trunk-plugins-owners
+      scope: ["*"]
+      escalation: critical-mass-engineering
+  agentRoles:
+    - capability: local-private
+      autonomy: R0
+      paths: ["*"]
+      independentReview: false
