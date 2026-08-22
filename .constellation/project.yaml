@@ -1,0 +1,41 @@
+---
+apiVersion: criticalmass.io/v1
+kind: Project
+metadata: { id: trunk-plugins, name: Trunk plugins }
+spec:
+  lifecycle: active
+  maturityTarget: 2
+  criticality: tier-3
+  visibility: internal
+  licence: UNLICENSED
+  dataClassification: internal
+  repository:
+    archetype: tooling
+    canonicalRemote: https://github.com/WeAreCriticalMass/trunk-plugins.git
+    defaultBranch: main
+    ciProfile: unknown
+  commands:
+    requiredNames: []
+    items: []
+  contracts:
+    {
+      ownership: .constellation/ownership.yaml,
+      policy: .constellation/policy.yaml,
+    }
+  documentation:
+    readme: README.md
+    agents: AGENTS.md
+    architecture: README.md
+    adrs: docs/adr
+    roadmap: docs/roadmap.md
+  registers:
+    risks: docs/registers/risks.yaml
+    decisions: docs/registers/decisions.yaml
+    openQuestions: docs/registers/open-questions.yaml
+    roadmapAmendments: docs/registers/roadmap-amendments.yaml
+  evidence:
+    source: mise run contract:check over .constellation contract set
+    digest: sha256:2bb0dab85bb3d981eab17e9bddfd5c9611b39aa139f95d21e69513e685f6acbd
+    observedAt: "2026-08-22T00:00:00Z"
+    confidence: verified
+    expiresAt: "2026-11-20T00:00:00Z"

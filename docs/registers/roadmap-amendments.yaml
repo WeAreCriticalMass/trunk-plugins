@@ -1,0 +1,11 @@
+schemaVersion: "1.0"
+kind: roadmap-amendments
+entries:
+  - id: A-001
+    date: "2026-08-22"
+    rationale: Onboard trunk-plugins with a minimal contract; AGENTS.md is created by contract:write.
+    changes:
+      - Landed the Constellation contract, managed block and minimal registers.
+    adrRefs: []
+    evidencePaths:
+      - .constellation/project.yaml
