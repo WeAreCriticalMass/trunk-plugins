@@ -2,13 +2,13 @@ schemaVersion: "1.0"
 kind: risk-register
 entries:
   - id: R-001
-    title: "Shared Trunk plugin has no repository contract"
+    title: Shared Trunk plugin has no repository contract
     status: mitigating
-    owner: "constellation-owners"
+    owner: constellation-owners
     created: "2026-08-22"
     review: "2026-11-22"
     expires: "2027-02-22"
     severity: medium
     likelihood: high
-    impact: "Every adopting repository inherits this plugin; an ungoverned source is a silent fleet-wide change."
-    mitigation: "Land the minimal contract and managed block in this tranche."
+    impact: Every adopting repository inherits this plugin; an ungoverned source is a silent fleet-wide change.
+    mitigation: Land the minimal contract and managed block in this tranche.

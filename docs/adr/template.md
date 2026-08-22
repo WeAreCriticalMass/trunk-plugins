@@ -1,7 +1,8 @@
-# ADR template
-
+<!--
 This file is a template. It is deliberately not named `NNNN-*.md`, so the ADR
-index check ignores it.
+index check ignores it. Copy it to `docs/adr/NNNN-kebab-title.md` and replace
+the heading with the decision stated as a claim.
+-->
 
 # Title
 
