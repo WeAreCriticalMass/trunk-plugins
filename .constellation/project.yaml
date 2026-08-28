@@ -6,7 +6,7 @@ spec:
   lifecycle: active
   maturityTarget: 2
   criticality: tier-3
-  visibility: internal
+  visibility: public
   licence: UNLICENSED
   dataClassification: internal
   repository:
@@ -35,7 +35,7 @@ spec:
     roadmapAmendments: docs/registers/roadmap-amendments.yaml
   evidence:
     source: mise run contract:check over .constellation contract set
-    digest: sha256:2bb0dab85bb3d981eab17e9bddfd5c9611b39aa139f95d21e69513e685f6acbd
-    observedAt: "2026-08-22T00:00:00Z"
+    digest: sha256:4e46a58869936979fde79b955b4a2e0a1687dd55c866447177e8041e97d17c6d
+    observedAt: "2026-08-28T00:00:00Z"
     confidence: verified
-    expiresAt: "2026-11-20T00:00:00Z"
+    expiresAt: "2026-11-26T00:00:00Z"
