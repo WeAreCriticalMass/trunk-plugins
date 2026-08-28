@@ -34,8 +34,11 @@ spec:
     openQuestions: docs/registers/open-questions.yaml
     roadmapAmendments: docs/registers/roadmap-amendments.yaml
   evidence:
-    source: mise run contract:check over .constellation contract set
-    digest: sha256:4e46a58869936979fde79b955b4a2e0a1687dd55c866447177e8041e97d17c6d
+    source: >-
+      node scripts/contract-check.mjs --root '<path to trunk-plugins>' over
+      .constellation contract set, from a Constellation checkout
+    digest: >-
+      sha256:4e46a58869936979fde79b955b4a2e0a1687dd55c866447177e8041e97d17c6d
     observedAt: "2026-08-28T00:00:00Z"
     confidence: verified
     expiresAt: "2026-11-26T00:00:00Z"
