@@ -35,6 +35,19 @@ cheap way to confirm an override landed, rather than inferring it from behaviour
 `plugin.yaml`. Upstream scopes its cache per repository, which duplicated a
 1.9 GB database 61 times on the shared runner.
 
+**pinact runs with double-dash flags.** Upstream's wrapper still builds
+`pinact run -format sarif`, which pinact v5 rejects, so every pull request that
+touched a workflow failed changed-file linting in repositories on pinact@5. The
+override runs upstream's own wrapper with only its flags adjusted (pinact v4
+accepts them too), so the fleet can stay on current pinact. Remove it once an
+upstream release contains trunk-io/plugins#1180.
+
+## Releases
+
+Repositories pin an immutable tag (`v1.1.0`, …), not the original `v1`, so
+Renovate's Trunk manager can propose each release like any other dependency.
+Tags are never moved.
+
 ## What does not belong here
 
 Anything a single repository needs. This file is read by every repository that

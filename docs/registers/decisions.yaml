@@ -10,3 +10,12 @@ entries:
     expires: "2027-02-22"
     decision: trunk-plugins declares no verification commands because it has no mise.toml or package.json.
     rationale: The artefact is a Trunk plugin.yaml; inventing pnpm test would be echo-theatre.
+  - id: D-002
+    title: Keep pinact current via a flag shim, not a version pin
+    status: accepted
+    owner: constellation-owners
+    created: "2026-10-07"
+    review: "2026-11-07"
+    expires: "2027-01-07"
+    decision: Override upstream's pinact commands to run its wrapper with single-dash long flags rewritten to double-dash, and release as immutable tag v1.1.0.
+    rationale: pinact v5 rejects single-dash long flags and the upstream fix (trunk-io/plugins#1180) is unreleased. Pinning pinact back to v4 would let the fleet drift behind; the shim is a no-op once upstream emits double-dash flags. Remove at review if upstream has released the fix.

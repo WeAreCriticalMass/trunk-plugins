@@ -26,3 +26,47 @@ lint:
           value: ${env.HOME}/.cache/grype-shared/db
         - name: PATH
           list: ["${linter}", "${env.PATH}"]
+
+    # pinact v5 compatibility, until upstream releases trunk-io/plugins#1180.
+    #
+    # Upstream's wrapper (v1.11.0, and main as of 2026-10-07) builds
+    # `pinact run -format sarif`. pinact v5 rejects single-dash long flags, so on
+    # every repository that pins pinact@5 each pull request touching a workflow
+    # failed changed-file linting with "unknown flag: -format". The fleet keeps
+    # pinact current rather than pinning it back, so these commands run upstream's
+    # own wrapper (`${plugin}` is upstream's directory, where pinact is defined)
+    # with only its argument builder adjusted: single-dash long flags become
+    # double-dash, which pinact v4 accepts too and which is a no-op once upstream
+    # emits them itself. `commands` is a sequence, so it is restated in full.
+    #
+    # Remove this definition once an upstream release contains #1180, and bump
+    # the upstream ref in Alidade's trunk.yaml template.
+    - name: pinact
+      known_good_version: 5.0.0
+      commands:
+        - name: lint
+          output: sarif
+          run: >-
+            python3 -c 'import importlib.util as u, sys; p = sys.argv[1]; sys.argv = [p, *sys.argv[2:]]; s = u.spec_from_file_location("pinact_run", p); m = u.module_from_spec(s); s.loader.exec_module(m); b = m.build_pinact_args; m.build_pinact_args = lambda mode: ["-" + a if a.startswith("-") and not a.startswith("--") and len(a) > 2 else a for a in b(mode)]; raise SystemExit(m.main())' ${plugin}/linters/pinact/pinact_run.py ${target}
+          success_codes: [0, 1, 2, 3]
+          batch: true
+          cache_results: true
+          is_security: true
+          read_output_from: stdout
+          disable_upstream: true
+        - name: upgrade
+          output: sarif
+          run: >-
+            python3 -c 'import importlib.util as u, sys; p = sys.argv[1]; sys.argv = [p, *sys.argv[2:]]; s = u.spec_from_file_location("pinact_run", p); m = u.module_from_spec(s); s.loader.exec_module(m); b = m.build_pinact_args; m.build_pinact_args = lambda mode: ["-" + a if a.startswith("-") and not a.startswith("--") and len(a) > 2 else a for a in b(mode)]; raise SystemExit(m.main())' ${plugin}/linters/pinact/pinact_run.py --upgrade ${target}
+          success_codes: [0, 1, 2, 3]
+          batch: true
+          cache_results: true
+          is_security: true
+          read_output_from: stdout
+          disable_upstream: true
+          enabled: false
+
+tools:
+  definitions:
+    - name: pinact
+      known_good_version: 5.0.0
