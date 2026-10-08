@@ -1,0 +1,14 @@
+---
+# actionlint configuration for repositories that render the fleet workflow
+# templates. actionlint rejects any `runs-on` label it does not know, and every
+# self-hosted label the templates use is one it cannot know, so a repository
+# that renders `github-ci.yml.tpl` or `github-macos-compatibility.yml.tpl`
+# without this file fails Trunk's actionlint on its first workflow change.
+# Render it to `.github/actionlint.yaml` alongside the workflows.
+self-hosted-runner:
+  labels:
+    - cm-linux
+    - cm-local
+    - critical-mass
+
+config-variables: null
