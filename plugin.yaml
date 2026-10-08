@@ -66,6 +66,32 @@ lint:
           disable_upstream: true
           enabled: false
 
+    # oxlint lints; Prettier formats. trunk-io/plugins v1.11.0 gave oxlint a
+    # `format` command that runs `oxfmt --write` at its own 100-column default,
+    # beside Prettier at the fleet's 80. Two formatters on the same JavaScript
+    # rewrite each other's output, and Trunk then reports every touched file as
+    # unformatted however it was written (Alidade #127, 2026-10-08). The fleet
+    # formatter is Prettier, so the oxfmt command is restated disabled; the lint
+    # command is restated unchanged because `commands` is a sequence.
+    - name: oxlint
+      commands:
+        - name: lint
+          output: sarif
+          run: oxlint --format sarif ${target}
+          success_codes: [0, 1]
+          batch: true
+          cache_results: true
+          read_output_from: stdout
+        - name: format
+          output: rewrite
+          run: oxfmt --write ${target}
+          success_codes: [0]
+          batch: true
+          cache_results: true
+          formatter: true
+          in_place: true
+          enabled: false
+
 tools:
   definitions:
     - name: pinact

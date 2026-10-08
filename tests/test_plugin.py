@@ -101,3 +101,25 @@ class GrypeOverrideTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class OxlintFormatterTests(unittest.TestCase):
+    """Prettier is the fleet JavaScript formatter; oxlint only lints."""
+
+    def section(self) -> str:
+        return PLUGIN.split("    - name: oxlint\n", 1)[1].split("\ntools:", 1)[0]
+
+    def test_the_oxfmt_command_is_disabled(self) -> None:
+        fmt = self.section().split("        - name: format\n", 1)[1]
+        self.assertIn("run: oxfmt --write ${target}", fmt)
+        self.assertIn("formatter: true", fmt)
+        self.assertIn("enabled: false", fmt)
+
+    def test_the_lint_command_is_restated_and_still_enabled(self) -> None:
+        lint = (
+            self.section()
+            .split("        - name: lint\n", 1)[1]
+            .split("        - name: format\n", 1)[0]
+        )
+        self.assertIn("run: oxlint --format sarif ${target}", lint)
+        self.assertNotIn("enabled: false", lint)
