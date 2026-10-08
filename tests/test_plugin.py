@@ -99,6 +99,54 @@ class GrypeOverrideTests(unittest.TestCase):
         self.assertRegex(PLUGIN, r'required_trunk_version: ">=1\.22\.2"')
 
 
+def oxipng_downloads() -> list[dict[str, str]]:
+    """The oxipng download entries, each as a flat key/value mapping."""
+    section = PLUGIN.split("  downloads:\n    - name: oxipng\n", 1)[1]
+    section = section.split("\n\n", 1)[0]
+    entries: list[dict[str, str]] = []
+    for line in section.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("- "):
+            entries.append({})
+            stripped = stripped[2:]
+        if ":" in stripped and entries:
+            key, value = stripped.split(":", 1)
+            entries[-1][key.strip()] = value.strip().strip('"')
+    return entries
+
+
+class OxipngDownloadTests(unittest.TestCase):
+    """Each platform must fetch a binary built for its own CPU."""
+
+    def url_for(self, os_name: str, cpu: str) -> str:
+        matches = [
+            entry["url"]
+            for entry in oxipng_downloads()
+            if entry.get("os") == os_name and entry.get("cpu", cpu) == cpu
+        ]
+        self.assertTrue(matches, f"no oxipng download for {os_name}/{cpu}")
+        return matches[0]
+
+    def test_apple_silicon_fetches_the_arm64_build(self) -> None:
+        # The x86_64 build cannot start on an Apple Silicon runner without
+        # Rosetta: "execve failed: Bad CPU type in executable".
+        self.assertIn("aarch64-apple-darwin", self.url_for("macos", "arm_64"))
+
+    def test_intel_macs_keep_the_x86_64_build(self) -> None:
+        self.assertIn("x86_64-apple-darwin", self.url_for("macos", "x86_64"))
+
+    def test_linux_is_mapped_per_cpu(self) -> None:
+        self.assertIn("x86_64-unknown-linux-musl", self.url_for("linux", "x86_64"))
+        self.assertIn("aarch64-unknown-linux-musl", self.url_for("linux", "arm_64"))
+
+    def test_every_macos_entry_names_its_cpu(self) -> None:
+        # An entry without `cpu` matches every CPU, which is how upstream's
+        # single macOS entry handed Apple Silicon the Intel binary.
+        for entry in oxipng_downloads():
+            if entry.get("os") == "macos":
+                self.assertIn("cpu", entry)
+
+
 if __name__ == "__main__":
     unittest.main()
 
