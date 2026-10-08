@@ -1,0 +1,10 @@
+[tools]
+python = "3.14.8"
+
+[tasks.test]
+description = "Run the plugin override tests"
+run = "python3 -m unittest discover -s tests -v"
+
+[tasks."ci:validate"]
+description = "Run the required verification gate"
+run = "python3 -m unittest discover -s tests"

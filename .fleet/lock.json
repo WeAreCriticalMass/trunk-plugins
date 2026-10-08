@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "source": "WeAreCriticalMass/Alidade",
+  "version": "local",
+  "commit": null,
+  "inputs": {
+    "LINUX_RUNNER": "ubuntu-24.04",
+    "TIMEOUT_MINUTES": "10",
+    "SETUP_STEPS": "      # fleet-allow: hosted-runner -- a public repository; public code never\n      # runs on the fleet's shared self-hosted runners (runnerPolicy).",
+    "LIGHT_TASK": "",
+    "LIGHT_PATHS": "",
+    "TRUNK_OBSERVATIONAL": "true",
+    "AUDIT_LEVEL": "high"
+  },
+  "files": {
+    ".github/workflows/ci.yml": {
+      "template": "templates/github-ci.yml.tpl",
+      "sha256": "81d9e584c7497193a741311453f8cd6c47afc09c5a215fc036a6c7c2388825e1"
+    },
+    ".github/actionlint.yaml": {
+      "template": "templates/actionlint.yaml",
+      "sha256": "a056b2cca427bf2a6b88db1f156c48f8f977ecb77b515996be103407679a92a0"
+    },
+    ".fleet/fleet_render.py": {
+      "template": "scripts/fleet_render.py",
+      "sha256": "44c43d5ccaf7980ccfe2dabe2f085bc9058eaeda827e831d29320559e56b53c6"
+    }
+  }
+}
