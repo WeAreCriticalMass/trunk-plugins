@@ -4,24 +4,31 @@ Trunk configuration shared across the Critical Mass fleet.
 
 Trunk merges plugin sources serially in the order a repository lists them, and a
 later source may override almost any configuration an earlier one sets. So this
-repository is listed *after* `trunk-io/plugins`, and holds only the places where
+repository is listed _after_ `trunk-io/plugins`, and holds only the places where
 the fleet deliberately differs from upstream defaults.
 
 ## Adopting it
 
-Add a second entry to `plugins.sources` in a repository's `.trunk/trunk.yaml`,
-after the upstream one:
+Run Alidade's `fleet-tooling/scripts/adopt_trunk_plugins.py --write`. It adds
+this repository as a second entry in `plugins.sources`, after the upstream one,
+pinned to the release named in Alidade's `fleet-toolchain.v1.json`, and it
+repins a checkout still on the moving `v1` tag. The result looks like this,
+with each `ref` an immutable release tag that Renovate moves:
 
 ```yaml
 plugins:
   sources:
     - id: trunk
-      ref: v1.11.0
+      ref: vX.Y.Z
       uri: https://github.com/trunk-io/plugins
     - id: critical-mass
-      ref: v1
+      ref: vX.Y.Z
       uri: https://github.com/WeAreCriticalMass/trunk-plugins
 ```
+
+Do not write `ref: v1`. It is a moving tag that names different plugin code
+on different days, and Renovate has no release to propose against it. Eighteen
+checkouts copied it from an earlier version of this example.
 
 Order is load-bearing. Listed first, upstream would win and this repository would
 have no effect while appearing to be adopted.
