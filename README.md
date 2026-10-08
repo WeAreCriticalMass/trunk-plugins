@@ -49,6 +49,12 @@ override runs upstream's own wrapper with only its flags adjusted (pinact v4
 accepts them too), so the fleet can stay on current pinact. Remove it once an
 upstream release contains trunk-io/plugins#1180.
 
+**oxipng fetches the build for the runner's CPU.** Upstream's single macOS
+download is the x86_64 binary, which cannot start on an Apple Silicon runner
+without Rosetta ("Bad CPU type in executable"), so any pull request that
+changed a PNG failed changed-file linting. The override maps macOS and Linux
+by CPU. Remove it once upstream selects the macOS asset by CPU.
+
 ## Releases
 
 Repositories pin an immutable tag (`v1.1.0`, …), not the original `v1`, so

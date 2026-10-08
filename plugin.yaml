@@ -5,6 +5,46 @@ version: 0.1
 required_trunk_version: ">=1.22.2"
 
 lint:
+  # oxipng on Apple Silicon, until upstream maps macOS by CPU.
+  #
+  # Upstream's oxipng download (v1.11.0, and main as of 2026-10-08) has a single
+  # macOS entry pointing at the x86_64-apple-darwin build. On an Apple Silicon
+  # runner without Rosetta that binary cannot start ("execve failed: Bad CPU
+  # type in executable"), so every pull request that changed a PNG failed
+  # changed-file linting with a tool failure rather than a finding. oxipng has
+  # published aarch64-apple-darwin builds since 9.0. `downloads` is a sequence,
+  # so every platform upstream lists is restated, with macOS split by CPU and
+  # the aarch64 Linux build added for the arm64 Linux runners.
+  #
+  # Remove this once upstream selects the macOS asset by CPU.
+  downloads:
+    - name: oxipng
+      downloads:
+        - os: macos
+          cpu: arm_64
+          url: https://github.com/shssoichiro/oxipng/releases/download/v${version}/oxipng-${version}-aarch64-apple-darwin.tar.gz
+          strip_components: 1
+        - os: macos
+          cpu: x86_64
+          url: https://github.com/shssoichiro/oxipng/releases/download/v${version}/oxipng-${version}-x86_64-apple-darwin.tar.gz
+          strip_components: 1
+        - os: linux
+          cpu: x86_64
+          url: https://github.com/shssoichiro/oxipng/releases/download/v${version}/oxipng-${version}-x86_64-unknown-linux-musl.tar.gz
+          strip_components: 1
+        - os: linux
+          cpu: arm_64
+          url: https://github.com/shssoichiro/oxipng/releases/download/v${version}/oxipng-${version}-aarch64-unknown-linux-musl.tar.gz
+          strip_components: 1
+        - os: windows
+          version: ">=9.0.0"
+          cpu: x86_64
+          url: https://github.com/shssoichiro/oxipng/releases/download/v${version}/oxipng-${version}-x86_64-pc-windows-msvc.zip
+          strip_components: 1
+        - os: windows
+          cpu: x86_64
+          url: https://github.com/shssoichiro/oxipng/releases/download/v${version}/oxipng-${version}-x86_64-pc-windows-msvc.zip
+
   definitions:
     # One vulnerability database for the machine, not one per repository.
     #
