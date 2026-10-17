@@ -76,16 +76,19 @@ import order is reported as a Ruff lint finding, which Ruff's own fix
 **trufflehog reports unverified secrets (v1.5.0, unreleased).** Upstream runs
 trufflehog with `--only-verified`, which reports a secret only when trufflehog
 can log in with it, so a private key, a revoked or test credential, or a token
-for an internal service passed silently. The fleet keeps one secret scanner,
-trufflehog in place of gitleaks, so the override runs it with
-`--results=verified,unverified,unknown` instead and reports those too. Only
+for an internal service passed silently. The override runs it with
+`--results=verified,unverified,unknown` instead and reports those too. This
+closes the verification gap, not gitleaks' coverage: trufflehog's detectors are
+keyed to known providers, so generic secrets (a password or internal key line)
+are still gitleaks' to find; keep gitleaks beside trufflehog. Only
 the command's `run` is restated: Trunk merges it into upstream's command, whose
 parser, a script in upstream's own directory, stays as it is. Each trufflehog
 release checked, from 3.90.13 to the fleet's 3.99.0, accepts the flag.
 trufflehog-git, the opt-in history scan, keeps upstream's verified-only
-command. Once this release is out, Alidade's Trunk profiles set
-`trufflehogReportsUnverified`, and the fleet render then retires gitleaks
-wherever trufflehog is rendered.
+command. Two limits come from upstream's parser: a finding inside a binary or
+archive file fails the linter (closed, not silent), and an encoded secret it
+cannot locate in the file is dropped. Mark a test fixture with an inline
+`trufflehog:ignore` or `trunk-ignore` comment.
 
 ## Releases
 

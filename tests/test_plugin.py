@@ -214,6 +214,10 @@ class RuffFormatterTests(unittest.TestCase):
 class TrufflehogResultsTests(unittest.TestCase):
     """trufflehog reports unverified secrets too, through upstream's parser."""
 
+    def test_trufflehog_git_is_left_to_upstream(self) -> None:
+        self.assertNotIn("- name: trufflehog-git", PLUGIN)
+
+
     def section(self) -> str:
         return definition("trufflehog")
 

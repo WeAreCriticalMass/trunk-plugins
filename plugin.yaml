@@ -178,15 +178,23 @@ lint:
     # confirms are live. Upstream (v1.11.0) runs `trufflehog filesystem --json
     # --fail --only-verified`, so a finding is reported only when trufflehog
     # can log in with it: a private key, a revoked or test credential, or a
-    # token for an internal service passes silently. The fleet keeps one secret
-    # scanner, trufflehog in place of gitleaks, and that needs it to report
-    # what gitleaks would. `--results=verified,unverified,unknown` replaces
+    # token for an internal service passes silently. This closes that
+    # verification gap only: trufflehog's detectors are keyed to known
+    # providers, so a generic password or internal key line is still not
+    # reported, which gitleaks' pattern rules cover; keep gitleaks beside it.
+    # `--results=verified,unverified,unknown` replaces
     # `--only-verified`: confirmed secrets, unconfirmed ones and those whose
     # verification failed with an error are all reported. `filtered_unverified`
     # (what trufflehog's own false-positive filter drops) stays out. Each
     # release checked, from upstream's known-good 3.90.13 to the fleet's
     # 3.99.0, accepts the flag; one without it would stop on an unknown flag
     # rather than quietly scan less.
+    #
+    # Known limits, from upstream's parser rather than this change: a finding
+    # inside a binary or archive file makes the parser fail on decoding (Trunk
+    # reports a linter failure, so it fails closed), and an encoded secret
+    # trufflehog finds but cannot locate in the file is dropped. Mark a test
+    # fixture with an inline `trufflehog:ignore` or `trunk-ignore` comment.
     #
     # Only `run` is named. Trunk merges commands on their `[name, version,
     # platforms]` tuple rather than replacing the list, and upstream's lint
