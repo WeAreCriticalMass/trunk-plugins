@@ -147,7 +147,9 @@ lint:
           in_place: true
           enabled: false
 
-    # Ruff formats Python as well as linting it, in place of black and isort.
+    # Ruff formats Python as well as linting it, in place of black. Its formatter
+    # does not sort imports: isort stays unless a repository's Ruff configuration
+    # selects the import rules (I), which Ruff's lint fix then resolves.
     #
     # The fleet keeps one formatter per language (Alidade #185): Prettier for
     # the languages it covers, Ruff for Python. Upstream (v1.11.0) ships Ruff's

@@ -184,7 +184,7 @@ class OxlintFormatterTests(unittest.TestCase):
 
 
 class RuffFormatterTests(unittest.TestCase):
-    """Ruff formats Python, in place of black and isort."""
+    """Ruff formats Python in place of black; its formatter does not sort imports."""
 
     def section(self) -> str:
         return definition("ruff")
