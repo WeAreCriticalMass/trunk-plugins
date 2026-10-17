@@ -55,6 +55,24 @@ without Rosetta ("Bad CPU type in executable"), so any pull request that
 changed a PNG failed changed-file linting. The override maps macOS and Linux
 by CPU. Remove it once upstream selects the macOS asset by CPU.
 
+**oxlint lints and Prettier formats, without oxfmt.** Upstream v1.11.0 gave
+oxlint a format command running oxfmt at a different width from Prettier, and
+the two rewrote each other's output. The override disables the oxfmt command
+and, from v1.4.0 (unreleased), replaces upstream's `tools: [oxfmt]` with
+`[oxlint]`, so a repository that enables oxlint no longer downloads a
+formatter nothing runs. (`tools: []` does not work: Trunk keeps upstream's.)
+
+**Ruff formats Python (v1.4.0, unreleased).** The fleet uses one formatter per
+language, and for Python that is Ruff, in place of black. Upstream ships Ruff's
+format command disabled; the override switches it on. Trunk merges commands on
+their `[name, version, platforms]` tuple rather than replacing the list, so only
+the format command is named, and upstream's lint commands, with their parser,
+are left untouched. A repository adopting this release can drop black from
+`lint.enabled`. Ruff's formatter does not sort imports, so keep isort unless the
+repository's Ruff configuration selects the import rules (`I`); with them,
+import order is reported as a Ruff lint finding, which Ruff's own fix
+(`ruff check --select I --fix`) resolves.
+
 ## Releases
 
 Repositories pin an immutable tag (`v1.1.0`, …), not the original `v1`, so
