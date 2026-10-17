@@ -73,6 +73,20 @@ repository's Ruff configuration selects the import rules (`I`); with them,
 import order is reported as a Ruff lint finding, which Ruff's own fix
 (`ruff check --select I --fix`) resolves.
 
+**trufflehog reports unverified secrets (v1.5.0, unreleased).** Upstream runs
+trufflehog with `--only-verified`, which reports a secret only when trufflehog
+can log in with it, so a private key, a revoked or test credential, or a token
+for an internal service passed silently. The fleet keeps one secret scanner,
+trufflehog in place of gitleaks, so the override runs it with
+`--results=verified,unverified,unknown` instead and reports those too. Only
+the command's `run` is restated: Trunk merges it into upstream's command, whose
+parser, a script in upstream's own directory, stays as it is. Each trufflehog
+release checked, from 3.90.13 to the fleet's 3.99.0, accepts the flag.
+trufflehog-git, the opt-in history scan, keeps upstream's verified-only
+command. Once this release is out, Alidade's Trunk profiles set
+`trufflehogReportsUnverified`, and the fleet render then retires gitleaks
+wherever trufflehog is rendered.
+
 ## Releases
 
 Repositories pin an immutable tag (`v1.1.0`, …), not the original `v1`, so
