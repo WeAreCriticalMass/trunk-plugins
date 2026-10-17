@@ -22,9 +22,14 @@ PLUGIN = (ROOT / "plugin.yaml").read_text(encoding="utf-8")
 
 
 def definition(name: str) -> str:
-    """One `lint.definitions` entry of plugin.yaml, up to the next entry."""
+    """One `lint.definitions` entry of plugin.yaml, up to the next entry.
+
+    The next entry starts at its own comment block, if it has one, so that
+    comment is not counted as part of this entry.
+    """
     section = PLUGIN.split(f"\n    - name: {name}\n", 1)[1]
-    return re.split(r"\n    - name: |\ntools:", section, maxsplit=1)[0]
+    next_entry = r"\n\n    #|\n    - name: |\ntools:"
+    return re.split(next_entry, section, maxsplit=1)[0]
 
 
 # A stand-in for upstream's linters/pinact/pinact_run.py: the same two names the
@@ -44,7 +49,7 @@ def main():
 
 def pinact_runs() -> list[str]:
     """The `run:` value of each pinact command, as Trunk would see it."""
-    section = PLUGIN.split("    - name: pinact\n", 1)[1].split("\ntools:", 1)[0]
+    section = definition("pinact")
     return [match.strip() for match in re.findall(r"run: >-\n\s+(.+)\n", section)]
 
 
@@ -87,9 +92,7 @@ class PinactShimTests(unittest.TestCase):
         self.assertEqual(out["argv"], ["--upgrade", "a.yml"])
 
     def test_upgrade_stays_opt_in(self) -> None:
-        upgrade = PLUGIN.split("        - name: upgrade\n", 1)[1].split("\ntools:", 1)[
-            0
-        ]
+        upgrade = definition("pinact").split("        - name: upgrade\n", 1)[1]
         self.assertIn("enabled: false", upgrade)
 
 
@@ -206,6 +209,70 @@ class RuffFormatterTests(unittest.TestCase):
             line for line in PLUGIN.splitlines() if not line.lstrip().startswith("#")
         ]
         self.assertFalse([line for line in configuration if "ruff_to_sarif" in line])
+
+
+class TrufflehogResultsTests(unittest.TestCase):
+    """trufflehog reports unverified secrets too, through upstream's parser."""
+
+    def test_trufflehog_git_is_left_to_upstream(self) -> None:
+        self.assertNotIn("- name: trufflehog-git", PLUGIN)
+
+    def section(self) -> str:
+        return definition("trufflehog")
+
+    def configuration(self) -> list[str]:
+        return [
+            line
+            for line in self.section().splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        ]
+
+    def run_line(self) -> str:
+        # The folded (`>-`) scalar, joined as YAML joins it: with spaces.
+        lines = self.section().split("          run: >-\n", 1)[1].splitlines()
+        folded = [line.strip() for line in lines if line.startswith(" " * 12)]
+        return " ".join(folded)
+
+    def test_unverified_and_unknown_results_are_reported(self) -> None:
+        argv = self.run_line().split()
+        self.assertEqual(argv[:2], ["trufflehog", "filesystem"])
+        self.assertIn("--results=verified,unverified,unknown", argv)
+        self.assertNotIn("--only-verified", argv)
+
+    def test_upstream_output_and_failure_flags_are_kept(self) -> None:
+        # The parser reads JSON lines; --fail exits 183 on a finding, which
+        # upstream lists among its success codes.
+        argv = self.run_line().split()
+        for flag in ("--json", "--fail", "--no-update"):
+            self.assertIn(flag, argv)
+        self.assertEqual(argv[-1], "${target}")
+
+    def test_only_run_is_named_on_upstream_lint_command(self) -> None:
+        # Trunk merges commands on [name, version, platforms]: no version or
+        # platforms, so the override lands on upstream's command.
+        self.assertEqual(
+            [line.strip() for line in self.configuration()],
+            [
+                "commands:",
+                "- name: lint",
+                "run: >-",
+                "trufflehog filesystem --json --fail",
+                "--results=verified,unverified,unknown --no-update ${target}",
+            ],
+        )
+
+    def test_upstream_parser_is_not_restated(self) -> None:
+        # Upstream's parser runs a script beside upstream's plugin.yaml.
+        # A copy here could resolve against this repository instead.
+        for line in self.configuration():
+            for word in ("parser", "_to_sarif", "${plugin}", "${cwd}"):
+                self.assertNotIn(word, line)
+
+    def test_the_override_and_its_comment_fit_in_80_columns(self) -> None:
+        start = PLUGIN.index("    # trufflehog reports every secret")
+        text = PLUGIN[start:].split("\n    - name: trufflehog\n", 1)[0]
+        for line in [*text.splitlines(), *self.section().splitlines()]:
+            self.assertLessEqual(len(line), 80, line)
 
 
 if __name__ == "__main__":
