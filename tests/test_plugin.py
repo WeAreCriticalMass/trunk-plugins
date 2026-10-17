@@ -217,7 +217,6 @@ class TrufflehogResultsTests(unittest.TestCase):
     def test_trufflehog_git_is_left_to_upstream(self) -> None:
         self.assertNotIn("- name: trufflehog-git", PLUGIN)
 
-
     def section(self) -> str:
         return definition("trufflehog")
 
