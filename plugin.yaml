@@ -147,6 +147,31 @@ lint:
           in_place: true
           enabled: false
 
+    # Ruff formats Python as well as linting it, in place of black and isort.
+    #
+    # The fleet keeps one formatter per language (Alidade #185): Prettier for
+    # the languages it covers, Ruff for Python. Upstream (v1.11.0) ships Ruff's
+    # `format` command with `enabled: false`, so a repository that enabled ruff
+    # got linting only and kept black, and often isort, beside it, each with
+    # its own idea of a formatted file. Enabling ruff is now enough to format
+    # Python.
+    #
+    # Unlike other sequences, Trunk does not replace `commands`: it applies an
+    # override to the upstream command with the same `[name, version,
+    # platforms]` tuple, and prepends one that matches none. Upstream's format
+    # command has no version or platforms, so naming it is enough to switch it
+    # on, and `trunk print-config` shows the four upstream `lint` commands
+    # still in place beside it. They are deliberately not restated:
+    # their parser runs `${cwd}/ruff_to_sarif.py`, a script that lives beside
+    # upstream's plugin.yaml, and a copy here could resolve against this
+    # repository instead and break Ruff linting across the fleet.
+    #
+    # Remove this definition if upstream enables Ruff's formatter by default.
+    - name: ruff
+      commands:
+        - name: format
+          enabled: true
+
 tools:
   definitions:
     - name: pinact

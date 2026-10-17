@@ -183,5 +183,30 @@ class OxlintFormatterTests(unittest.TestCase):
         self.assertNotIn("tools: [oxfmt]", self.section())
 
 
+class RuffFormatterTests(unittest.TestCase):
+    """Ruff formats Python, in place of black and isort."""
+
+    def section(self) -> str:
+        return definition("ruff")
+
+    def test_the_format_command_is_enabled(self) -> None:
+        commands = self.section().split("      commands:\n", 1)[1]
+        self.assertEqual(
+            [line.strip() for line in commands.strip().splitlines()],
+            ["- name: format", "enabled: true"],
+        )
+
+    def test_the_lint_commands_are_left_to_upstream(self) -> None:
+        # Trunk merges commands on [name, version, platforms]. Restating the
+        # lint commands would also restate their `${cwd}/ruff_to_sarif.py`
+        # parser, which could then resolve against this repository, where the
+        # script does not exist.
+        self.assertNotIn("name: lint", self.section())
+        configuration = [
+            line for line in PLUGIN.splitlines() if not line.lstrip().startswith("#")
+        ]
+        self.assertFalse([line for line in configuration if "ruff_to_sarif" in line])
+
+
 if __name__ == "__main__":
     unittest.main()
