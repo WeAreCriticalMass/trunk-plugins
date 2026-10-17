@@ -55,6 +55,13 @@ without Rosetta ("Bad CPU type in executable"), so any pull request that
 changed a PNG failed changed-file linting. The override maps macOS and Linux
 by CPU. Remove it once upstream selects the macOS asset by CPU.
 
+**oxlint lints and Prettier formats, without oxfmt.** Upstream v1.11.0 gave
+oxlint a format command running oxfmt at a different width from Prettier, and
+the two rewrote each other's output. The override disables the oxfmt command
+and, from v1.4.0 (unreleased), replaces upstream's `tools: [oxfmt]` with
+`[oxlint]`, so a repository that enables oxlint no longer downloads a
+formatter nothing runs. (`tools: []` does not work: Trunk keeps upstream's.)
+
 ## Releases
 
 Repositories pin an immutable tag (`v1.1.0`, …), not the original `v1`, so

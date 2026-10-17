@@ -20,6 +20,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PLUGIN = (ROOT / "plugin.yaml").read_text(encoding="utf-8")
 
+
+def definition(name: str) -> str:
+    """One `lint.definitions` entry of plugin.yaml, up to the next entry."""
+    section = PLUGIN.split(f"\n    - name: {name}\n", 1)[1]
+    return re.split(r"\n    - name: |\ntools:", section, maxsplit=1)[0]
+
+
 # A stand-in for upstream's linters/pinact/pinact_run.py: the same two names the
 # shim relies on, build_pinact_args(mode) and main(), and main reports the
 # arguments it would hand pinact so the test can see what the shim produced.
@@ -147,15 +154,11 @@ class OxipngDownloadTests(unittest.TestCase):
                 self.assertIn("cpu", entry)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class OxlintFormatterTests(unittest.TestCase):
     """Prettier is the fleet JavaScript formatter; oxlint only lints."""
 
     def section(self) -> str:
-        return PLUGIN.split("    - name: oxlint\n", 1)[1].split("\ntools:", 1)[0]
+        return definition("oxlint")
 
     def test_the_oxfmt_command_is_disabled(self) -> None:
         fmt = self.section().split("        - name: format\n", 1)[1]
@@ -171,3 +174,14 @@ class OxlintFormatterTests(unittest.TestCase):
         )
         self.assertIn("run: oxlint --format sarif ${target}", lint)
         self.assertNotIn("enabled: false", lint)
+
+    def test_oxfmt_is_no_longer_a_required_tool(self) -> None:
+        # Upstream declares `tools: [oxfmt]`; with the formatter off nothing
+        # runs it. The restated sequence names oxlint's own tool and is not
+        # empty: Trunk treats `tools: []` as absent and keeps upstream's oxfmt.
+        self.assertRegex(self.section(), r"(?m)^      tools: \[oxlint\]$")
+        self.assertNotIn("tools: [oxfmt]", self.section())
+
+
+if __name__ == "__main__":
+    unittest.main()
